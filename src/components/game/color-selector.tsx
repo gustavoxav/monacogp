@@ -18,7 +18,7 @@ export function ColorSelector({
   const [isExpanded, setIsExpanded] = useState(false);
 
   return (
-    <div className="absolute top-4 left-4 bg-black/80 rounded-lg border-2 border-cyan-500 overflow-hidden">
+    <div className="absolute z-50 top-4 left-4 bg-black/80 rounded-lg border-2 border-cyan-500 overflow-hidden">
       <Button
         onClick={() => setIsExpanded(!isExpanded)}
         variant="ghost"

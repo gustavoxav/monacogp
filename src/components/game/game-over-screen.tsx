@@ -14,7 +14,7 @@ export function GameOverScreen({
   const isNewRecord = score >= highScore && score > 0;
 
   return (
-    <div className="absolute inset-0 flex items-center justify-center bg-black/80 backdrop-blur-sm rounded-lg">
+    <div className="absolute z-10 inset-0 flex items-center justify-center bg-black/80 backdrop-blur-sm rounded-lg">
       <div className="text-center space-y-6 p-8">
         <h2 className="text-6xl font-bold text-[#ff006e] animate-pulse">
           GAME OVER

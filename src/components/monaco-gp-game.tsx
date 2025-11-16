@@ -248,7 +248,7 @@ const MonacoGPGame = () => {
   }, [gameState, highScore, keysRef, playerColor]);
 
   return (
-    <div className="relative">
+    <div className="relative flex items-center justify-center">
       <div className="relative inline-block">
         <ColorSelector
           colors={PLAYER_CAR_COLORS}
