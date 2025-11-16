@@ -120,7 +120,7 @@ export class GameRenderer {
     );
 
     this.ctx.fillStyle = "#8338ec";
-    this.ctx.fillText(`CARROS: ${carsPassed}`, canvasWidth - 20, 105);
+    this.ctx.fillText(`DISTÂNCIA: ${distance.toFixed(0)}`, canvasWidth - 20, 105);
 
     if (highScore > 0) {
       this.ctx.fillStyle = "#ff006e";

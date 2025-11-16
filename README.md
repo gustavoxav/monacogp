@@ -220,7 +220,7 @@ export const LANE_WIDTH = 80       // Largura das pistas
 
 A velocidade base aumenta progressivamente:
 - **Velocidade Inicial**: 3 pixels/frame
-- **Incremento**: +0.5 pixels/frame a cada carro ultrapassado
+- **Distância Percorrida**: 
 - **Velocidade Máxima**: Sem limite (aumenta indefinidamente)
 
 ### Detecção de Colisão
@@ -231,8 +231,8 @@ O jogo usa colisão por bounding box (AABB):
 
 ### Sistema de Pontuação
 
-- **1 ponto** por cada carro ultrapassado
-- **Recorde** salvo no estado do jogo (não persiste ao recarregar)
+- **1 ponto** por cada metro ultrapassado
+- **Recorde** salvo no estado do jogo
 - Display em tempo real no HUD
 
 ### Geração de Carros
