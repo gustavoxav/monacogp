@@ -21,6 +21,7 @@ import {
   SPEED_INCREMENT,
 } from "@/lib/game-constants";
 import type { Car, GameState, Particle, Player } from "@/types/game";
+import { PauseScreen } from "./game/pause-screen";
 
 const MonacoGPGame = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -247,6 +248,18 @@ const MonacoGPGame = () => {
     };
   }, [gameState, highScore, keysRef, playerColor]);
 
+  const handlePause = () => {
+    if (gameState === "playing") {
+      setGameState("paused");
+    }
+  };
+
+  const handleResume = () => {
+    if (gameState === "paused") {
+      setGameState("playing");
+    }
+  };
+
   return (
     <div className="relative flex items-center justify-center">
       <div className="relative inline-block">
@@ -261,6 +274,15 @@ const MonacoGPGame = () => {
           height={CANVAS_HEIGHT}
           ref={canvasRef}
         />
+        {gameState === "playing" && (
+          <button
+            onClick={handlePause}
+            className="absolute top-4 right-4 px-4 py-2 bg-gradient-to-r from-[#ff006e] to-[#fb5607] text-white font-bold rounded-lg hover:scale-105 transition-transform shadow-lg shadow-[#ff006e]/50">
+            Pausar
+          </button>
+        )}
+
+        {gameState === "paused" && <PauseScreen onResume={handleResume} />}
 
         {gameState === "gameOver" && (
           <GameOverScreen

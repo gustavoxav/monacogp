@@ -35,4 +35,4 @@ export interface GameKeys {
   right: boolean
 }
 
-export type GameState = 'playing' | 'gameOver'
+export type GameState = 'playing' | 'gameOver' | 'paused';
