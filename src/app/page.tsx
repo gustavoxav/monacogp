@@ -21,18 +21,6 @@ export default function Home() {
           <div className="inline-flex gap-6 flex-wrap items-center justify-center bg-black/40 backdrop-blur-sm px-8 py-4 rounded-xl border-2 border-[#ff006e]/30">
             <div className="flex items-center gap-2">
               <kbd className="px-3 py-2 bg-[#ff006e]/20 border-2 border-[#ff006e] rounded text-[#ff006e] font-bold">
-                ↑
-              </kbd>
-              <span className="text-white/80 font-mono">Acelerar</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <kbd className="px-3 py-2 bg-[#ff006e]/20 border-2 border-[#ff006e] rounded text-[#ff006e] font-bold">
-                ↓
-              </kbd>
-              <span className="text-white/80 font-mono">Frear</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <kbd className="px-3 py-2 bg-[#ff006e]/20 border-2 border-[#ff006e] rounded text-[#ff006e] font-bold">
                 ←
               </kbd>
               <kbd className="px-3 py-2 bg-[#ff006e]/20 border-2 border-[#ff006e] rounded text-[#ff006e] font-bold">

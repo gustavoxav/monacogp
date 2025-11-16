@@ -42,7 +42,8 @@ export const initializeRacers = (colors: string[], mapHeight: number): Car[] => 
       speed: Math.random() * 0.5 + 0.5,
       direction: Math.random(),
       isLeft,
-      isRight: !isLeft
+      isRight: !isLeft,
+      passed: false
     }
   })
 }
