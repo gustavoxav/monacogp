@@ -20,7 +20,7 @@ export function GameOverScreen({
           GAME OVER
         </h2>
         <div className="space-y-2">
-          <p className="text-4xl font-bold text-[#00f5ff]">{score}m</p>
+          <p className="text-4xl font-bold text-[#00f5ff]">{score}km</p>
           {isNewRecord && (
             <p className="text-2xl text-[#ffbe0b] font-bold animate-pulse">
               NOVO RECORDE!
