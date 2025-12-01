@@ -1,8 +1,7 @@
-"use client";
-
 import { useEffect, useRef, useState } from "react";
 import { GameCanvas } from "./game/game-canvas";
 import { GameOverScreen } from "./game/game-over-screen";
+import { PauseScreen } from "./game/pause-screen";
 import { ColorSelector } from "./game/color-selector";
 import { GameRenderer } from "./game/game-renderer";
 import { useKeyboard } from "@/hooks/use-keyboard";
@@ -21,14 +20,22 @@ import {
   SPEED_INCREMENT,
 } from "@/lib/game-constants";
 import type { Car, GameState, Particle, Player } from "@/types/game";
-import { PauseScreen } from "./game/pause-screen";
+
+const HIGH_SCORE_KEY = "monaco-gp-high-score";
 
 const MonacoGPGame = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [gameState, setGameState] = useState<GameState>("playing");
   const [score, setScore] = useState(0);
-  const [highScore, setHighScore] = useState(0);
+  const [highScore, setHighScore] = useState(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem(HIGH_SCORE_KEY);
+      return saved ? Number.parseInt(saved, 10) : 0;
+    }
+    return 0;
+  });
   const [playerColor, setPlayerColor] = useState(PLAYER_INITIAL_STATE.color);
+  const [touchStartX, setTouchStartX] = useState<number | null>(null);
 
   const gameRef = useRef({
     player: { ...PLAYER_INITIAL_STATE } as Player,
@@ -55,7 +62,82 @@ const MonacoGPGame = () => {
     gameRef.current.player.color = color;
   };
 
+  const handlePause = () => {
+    if (gameState === "playing") {
+      setGameState("paused");
+    }
+  };
+
+  const handleResume = () => {
+    if (gameState === "paused") {
+      setGameState("playing");
+    }
+  };
+
   const keysRef = useKeyboard(resetGame);
+
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "hidden" && gameState === "playing") {
+        setGameState("paused");
+      }
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
+  }, [gameState]);
+
+  useEffect(() => {
+    if (typeof window !== "undefined" && highScore > 0) {
+      localStorage.setItem(HIGH_SCORE_KEY, highScore.toString());
+    }
+  }, [highScore]);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const handleTouchStart = (e: TouchEvent) => {
+      e.preventDefault();
+      const touch = e.touches[0];
+      setTouchStartX(touch.clientX);
+    };
+
+    const handleTouchMove = (e: TouchEvent) => {
+      e.preventDefault();
+      if (touchStartX === null) return;
+
+      const touch = e.touches[0];
+      const deltaX = touch.clientX - touchStartX;
+      const game = gameRef.current;
+
+      if (deltaX < -10 && game.player.x > 110) {
+        game.player.x -= 4;
+      } else if (deltaX > 10 && game.player.x < 290) {
+        game.player.x += 4;
+      }
+
+      setTouchStartX(touch.clientX);
+    };
+
+    const handleTouchEnd = (e: TouchEvent) => {
+      e.preventDefault();
+      setTouchStartX(null);
+    };
+
+    canvas.addEventListener("touchstart", handleTouchStart, { passive: false });
+    canvas.addEventListener("touchmove", handleTouchMove, { passive: false });
+    canvas.addEventListener("touchend", handleTouchEnd, { passive: false });
+
+    return () => {
+      canvas.removeEventListener("touchstart", handleTouchStart);
+      canvas.removeEventListener("touchmove", handleTouchMove);
+      canvas.removeEventListener("touchend", handleTouchEnd);
+    };
+  }, [touchStartX]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -81,7 +163,7 @@ const MonacoGPGame = () => {
 
       // Update and draw racers
       game.racers.forEach((racer) => {
-        racer.y -= 1;
+        racer.y -= game.player.speed;
 
         const racerScreenY = racer.y - game.player.cameraY + CANVAS_HEIGHT / 2;
         const playerScreenY = CANVAS_HEIGHT / 2;
@@ -180,7 +262,7 @@ const MonacoGPGame = () => {
         game.player.x += 2;
       }
 
-      game.player.y -= 2;
+      game.player.y -= game.player.speed * 2;
       game.player.cameraY = game.player.y;
 
       if (game.player.y < -MAP_HEIGHT) {
@@ -247,18 +329,6 @@ const MonacoGPGame = () => {
       cancelAnimationFrame(gameRef.current.animationId);
     };
   }, [gameState, highScore, keysRef, playerColor]);
-
-  const handlePause = () => {
-    if (gameState === "playing") {
-      setGameState("paused");
-    }
-  };
-
-  const handleResume = () => {
-    if (gameState === "paused") {
-      setGameState("playing");
-    }
-  };
 
   return (
     <div className="relative flex items-center justify-center">
