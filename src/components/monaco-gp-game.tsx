@@ -1,3 +1,5 @@
+"use client";
+
 import { useEffect, useRef, useState } from "react";
 import { GameCanvas } from "./game/game-canvas";
 import { GameOverScreen } from "./game/game-over-screen";
@@ -18,6 +20,8 @@ import {
   RACER_COLORS,
   PLAYER_CAR_COLORS,
   SPEED_INCREMENT,
+  BASE_SPEED_KMH,
+  KM_CONVERSION_FACTOR,
 } from "@/lib/game-constants";
 import type { Car, GameState, Particle, Player } from "@/types/game";
 
@@ -30,7 +34,7 @@ const MonacoGPGame = () => {
   const [highScore, setHighScore] = useState(() => {
     if (typeof window !== "undefined") {
       const saved = localStorage.getItem(HIGH_SCORE_KEY);
-      return saved ? Number.parseInt(saved, 10) : 0;
+      return saved ? Number.parseFloat(saved) : 0;
     }
     return 0;
   });
@@ -249,7 +253,7 @@ const MonacoGPGame = () => {
           ) {
             setGameState("gameOver");
             if (game.distance > highScore) {
-              setHighScore(Math.floor(game.distance));
+              setHighScore(Number.parseFloat(game.distance.toFixed(2)));
             }
           }
         });
@@ -308,13 +312,14 @@ const MonacoGPGame = () => {
       );
       ctx.restore();
 
-      // Update distance
-      game.distance += game.player.speed / 100;
-      setScore(Math.floor(game.distance));
+      game.distance += game.player.speed * KM_CONVERSION_FACTOR;
+      setScore(Number.parseFloat(game.distance.toFixed(2)));
+
+      const currentSpeedKmh = BASE_SPEED_KMH + (game.player.speed - 1) * 20;
 
       renderer.drawHUD(
         game.distance,
-        game.player.speed,
+        currentSpeedKmh,
         highScore,
         game.carsPassed,
         CANVAS_WIDTH

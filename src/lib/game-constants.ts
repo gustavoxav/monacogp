@@ -29,5 +29,7 @@ export const PLAYER_INITIAL_STATE = {
   color: "#00f5ff",
 };
 
-export const SPEED_INCREMENT = 1;
+export const SPEED_INCREMENT = 0.15;
 export const CARS_PER_SPEED_UP = 1;
+export const BASE_SPEED_KMH = 80; // Base speed in km/h
+export const KM_CONVERSION_FACTOR = 0.01; // Factor to convert game distance to kilometers
