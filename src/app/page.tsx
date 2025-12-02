@@ -1,5 +1,6 @@
 "use client";
 
+import { Footer } from "@/components/game/footer";
 import { MonacoGPGame } from "@/components/monaco-gp-game";
 
 export default function Home() {
@@ -41,6 +42,7 @@ export default function Home() {
           </p>
         </div>
       </div>
+      <Footer githubUsername="gustavoxav" />
     </div>
   );
 }
