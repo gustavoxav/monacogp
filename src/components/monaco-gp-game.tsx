@@ -5,8 +5,10 @@ import { GameCanvas } from "./game/game-canvas";
 import { GameOverScreen } from "./game/game-over-screen";
 import { PauseScreen } from "./game/pause-screen";
 import { ColorSelector } from "./game/color-selector";
+import { SoundToggleButton } from "./game/sound-toggle-button";
 import { GameRenderer } from "./game/game-renderer";
 import { useKeyboard } from "@/hooks/use-keyboard";
+import { useGameAudio } from "@/hooks/use-game-audio";
 import {
   checkCollision,
   createParticles,
@@ -21,6 +23,7 @@ import {
   PLAYER_CAR_COLORS,
   SPEED_INCREMENT,
   BASE_SPEED_KMH,
+  MAX_SPEED_KMH,
   KM_CONVERSION_FACTOR,
 } from "@/lib/game-constants";
 import type { Car, GameState, Particle, Player } from "@/types/game";
@@ -40,6 +43,16 @@ const MonacoGPGame = () => {
   });
   const [playerColor, setPlayerColor] = useState(PLAYER_INITIAL_STATE.color);
   const [touchStartX, setTouchStartX] = useState<number | null>(null);
+
+  const {
+    playTrack,
+    playGameOverSequence,
+    playButtonSound,
+    stopAll,
+    toggleMute,
+    isMuted,
+  } = useGameAudio();
+  const previousGameStateRef = useRef<GameState>("playing");
 
   const gameRef = useRef({
     player: { ...PLAYER_INITIAL_STATE } as Player,
@@ -62,6 +75,7 @@ const MonacoGPGame = () => {
   };
 
   const handleColorSelect = (color: string) => {
+    playButtonSound();
     setPlayerColor(color);
     gameRef.current.player.color = color;
   };
@@ -73,12 +87,31 @@ const MonacoGPGame = () => {
   };
 
   const handleResume = () => {
+    playButtonSound();
     if (gameState === "paused") {
       setGameState("playing");
     }
   };
 
   const keysRef = useKeyboard(resetGame);
+
+  useEffect(() => {
+    if (gameState === "playing" && previousGameStateRef.current !== "playing") {
+      playTrack("gameplay");
+    } else if (
+      gameState === "paused" &&
+      previousGameStateRef.current !== "paused"
+    ) {
+      playTrack("pause");
+    } else if (
+      gameState === "gameOver" &&
+      previousGameStateRef.current !== "gameOver"
+    ) {
+      playGameOverSequence();
+    }
+
+    previousGameStateRef.current = gameState;
+  }, [gameState, playTrack, playGameOverSequence]);
 
   useEffect(() => {
     const handleVisibilityChange = () => {
@@ -152,7 +185,6 @@ const MonacoGPGame = () => {
 
     const renderer = new GameRenderer(ctx);
 
-    // Initialize racers
     gameRef.current.racers = initializeRacers(RACER_COLORS, MAP_HEIGHT);
     gameRef.current.player.color = playerColor;
 
@@ -165,7 +197,6 @@ const MonacoGPGame = () => {
       renderer.clearCanvas(CANVAS_WIDTH, CANVAS_HEIGHT);
       renderer.drawRoad(CANVAS_WIDTH, CANVAS_HEIGHT, game.player.cameraY);
 
-      // Update and draw racers
       game.racers.forEach((racer) => {
         racer.y -= game.player.speed;
 
@@ -177,8 +208,14 @@ const MonacoGPGame = () => {
             racer.passed = true;
             game.carsPassed++;
 
-            game.baseSpeed += SPEED_INCREMENT;
-            game.player.speed = game.baseSpeed;
+            const currentSpeedKmh =
+              BASE_SPEED_KMH + (game.player.speed - 1) * 20;
+
+            // Only increase speed if we haven't reached the max speed limit
+            if (currentSpeedKmh < MAX_SPEED_KMH) {
+              game.baseSpeed += SPEED_INCREMENT;
+              game.player.speed = game.baseSpeed;
+            }
           }
         }
 
@@ -201,7 +238,6 @@ const MonacoGPGame = () => {
           racer.isLeft = false;
         }
 
-        // Draw racer and clones
         ctx.save();
         ctx.translate(0, CANVAS_HEIGHT / 2 - game.player.cameraY);
         renderer.drawCar(
@@ -227,7 +263,6 @@ const MonacoGPGame = () => {
         );
         ctx.restore();
 
-        // Check collision with player
         const racerPositions = [
           { x: racer.x, y: racer.y },
           { x: racer.x, y: racer.y + MAP_HEIGHT },
@@ -273,7 +308,6 @@ const MonacoGPGame = () => {
         game.player.y = 0;
       }
 
-      // Create speed particles
       if (Math.random() < 0.3) {
         createParticles(
           game.player.x,
@@ -283,7 +317,6 @@ const MonacoGPGame = () => {
         );
       }
 
-      // Update and draw particles
       ctx.save();
       ctx.translate(0, CANVAS_HEIGHT / 2 - game.player.cameraY);
       game.particles = game.particles.filter((particle) => {
@@ -299,7 +332,6 @@ const MonacoGPGame = () => {
       });
       ctx.restore();
 
-      // Draw player
       ctx.save();
       ctx.translate(0, CANVAS_HEIGHT / 2 - game.player.cameraY);
       renderer.drawCar(
@@ -335,15 +367,15 @@ const MonacoGPGame = () => {
     };
   }, [gameState, highScore, keysRef, playerColor]);
 
+  useEffect(() => {
+    return () => {
+      stopAll();
+    };
+  }, [stopAll]);
+
   return (
     <div className="relative flex items-center justify-center">
       <div className="relative inline-block">
-        <ColorSelector
-          colors={PLAYER_CAR_COLORS}
-          selectedColor={playerColor}
-          onColorSelect={handleColorSelect}
-        />
-
         <GameCanvas
           width={CANVAS_WIDTH}
           height={CANVAS_HEIGHT}
@@ -357,16 +389,30 @@ const MonacoGPGame = () => {
           </button>
         )}
 
-        {gameState === "paused" && <PauseScreen onResume={handleResume} />}
+        {gameState === "paused" && (
+          <PauseScreen
+            onResume={handleResume}
+            playerColor={playerColor}
+            handleColorSelect={handleColorSelect}
+          />
+        )}
 
         {gameState === "gameOver" && (
           <GameOverScreen
             score={score}
             highScore={highScore}
             onRestart={resetGame}
+            onPlayButtonSound={playButtonSound}
+            playerColor={playerColor}
+            handleColorSelect={handleColorSelect}
           />
         )}
       </div>
+      <SoundToggleButton
+        isMuted={isMuted}
+        onToggle={toggleMute}
+        onPlayButtonSound={playButtonSound}
+      />
     </div>
   );
 };

@@ -89,18 +89,15 @@ export class GameRenderer {
     this.ctx.fillStyle = "#00f5ff"
     this.ctx.font = "bold 40px monospace"
     this.ctx.textAlign = "right"
-    this.ctx.fillText(`${distance.toFixed(2)} km`, canvasWidth - 20, 50)
+    this.ctx.fillText(`${distance.toFixed(0)}km `, canvasWidth - 92, 42)
 
     this.ctx.font = "bold 16px monospace"
     this.ctx.fillStyle = "#ffbe0b"
     this.ctx.fillText(`VELOCIDADE: ${Math.floor(speed)} km/h`, canvasWidth - 20, 80)
 
-    this.ctx.fillStyle = "#8338ec"
-    this.ctx.fillText(`CARROS: ${carsPassed}`, canvasWidth - 20, 105)
-
     if (highScore > 0) {
       this.ctx.fillStyle = "#ff006e"
-      this.ctx.fillText(`RECORDE: ${highScore.toFixed(2)} km`, canvasWidth - 20, 130)
+      this.ctx.fillText(`RECORDE: ${highScore.toFixed(2)} km`, canvasWidth - 20, 100)
     }
     this.ctx.restore()
   }

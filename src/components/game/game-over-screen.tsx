@@ -1,26 +1,46 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
+import { ColorSelector } from "./color-selector";
+import { PLAYER_CAR_COLORS } from "@/lib/game-constants";
 
 interface GameOverScreenProps {
   score: number;
   highScore: number;
   onRestart: () => void;
+  onPlayButtonSound: () => void;
+  playerColor: string;
+  handleColorSelect: (color: string) => void;
 }
 
 export function GameOverScreen({
   score,
   highScore,
   onRestart,
+  onPlayButtonSound,
+  playerColor,
+  handleColorSelect,
 }: Readonly<GameOverScreenProps>) {
   const isNewRecord = score >= highScore && score > 0;
 
+  const handleRestart = () => {
+    onPlayButtonSound();
+    onRestart();
+  };
+
   return (
-    <div className="absolute z-10 inset-0 flex items-center justify-center bg-black/80 backdrop-blur-sm rounded-lg">
+    <div className="absolute inset-0 flex items-center justify-center bg-black/80 backdrop-blur-sm rounded-lg">
+      <ColorSelector
+        colors={PLAYER_CAR_COLORS}
+        selectedColor={playerColor}
+        onColorSelect={handleColorSelect}
+      />
       <div className="text-center space-y-6 p-8">
         <h2 className="text-6xl font-bold text-[#ff006e] animate-pulse">
           GAME OVER
         </h2>
         <div className="space-y-2">
-          <p className="text-4xl font-bold text-[#00f5ff]">{score}km</p>
+          <p className="text-4xl font-bold text-[#00f5ff]">{score} km</p>
           {isNewRecord && (
             <p className="text-2xl text-[#ffbe0b] font-bold animate-pulse">
               NOVO RECORDE!
@@ -28,7 +48,7 @@ export function GameOverScreen({
           )}
         </div>
         <Button
-          onClick={onRestart}
+          onClick={handleRestart}
           className="bg-gradient-to-r from-[#ff006e] to-[#8338ec] text-white text-xl px-8 py-6 rounded-xl font-bold hover:scale-110 transition-transform shadow-lg shadow-[#ff006e]/50">
           JOGAR NOVAMENTE
         </Button>

@@ -18,13 +18,13 @@ export function ColorSelector({
   const [isExpanded, setIsExpanded] = useState(false);
 
   return (
-    <div className="absolute z-50 top-4 left-4 bg-black/80 rounded-lg border-2 border-cyan-500 overflow-hidden">
+    <div className="absolute top-4 left-4 bg-black/80 rounded-lg border-2 border-cyan-500 overflow-hidden">
       <Button
         onClick={() => setIsExpanded(!isExpanded)}
         variant="ghost"
         size="sm"
         className="w-full flex items-center justify-between text-cyan-400 hover:text-cyan-300 hover:bg-cyan-500/20 px-3 py-2">
-        <span className="text-sm font-bold font-mono">CORES</span>
+        <span className="text-sm font-bold font-mono">Escolha a cor do seu carro</span>
         {isExpanded ? (
           <ChevronUp className="w-4 h-4" />
         ) : (
