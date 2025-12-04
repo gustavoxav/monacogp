@@ -34,3 +34,4 @@ export const CARS_PER_SPEED_UP = 1;
 export const BASE_SPEED_KMH = 80; // Base speed in km/h
 export const MAX_SPEED_KMH = 200 // Maximum speed cap at 200 km/h
 export const KM_CONVERSION_FACTOR = 0.01; // Factor to convert game distance to kilometers
+export const SAFE_SPAWN_DISTANCE = 150 // Minimum distance from player to spawn cars (in pixels)

@@ -25,6 +25,7 @@ import {
   BASE_SPEED_KMH,
   MAX_SPEED_KMH,
   KM_CONVERSION_FACTOR,
+  SAFE_SPAWN_DISTANCE,
 } from "@/lib/game-constants";
 import type { Car, GameState, Particle, Player } from "@/types/game";
 
@@ -70,6 +71,11 @@ const MonacoGPGame = () => {
     gameRef.current.particles = [];
     gameRef.current.carsPassed = 0;
     gameRef.current.baseSpeed = 1;
+    gameRef.current.racers = initializeRacers(
+      RACER_COLORS,
+      MAP_HEIGHT,
+      SAFE_SPAWN_DISTANCE
+    );
     setScore(0);
     setGameState("playing");
   };
@@ -185,7 +191,11 @@ const MonacoGPGame = () => {
 
     const renderer = new GameRenderer(ctx);
 
-    gameRef.current.racers = initializeRacers(RACER_COLORS, MAP_HEIGHT);
+    gameRef.current.racers = initializeRacers(
+      RACER_COLORS,
+      MAP_HEIGHT,
+      SAFE_SPAWN_DISTANCE
+    );
     gameRef.current.player.color = playerColor;
 
     const gameLoop = () => {

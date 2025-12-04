@@ -1,4 +1,4 @@
-import type { Car, Particle } from '@/types/game'
+import type { Car, Particle } from "@/types/game";
 
 export const checkCollision = (
   rect1: { x: number; y: number; width: number; height: number },
@@ -9,8 +9,8 @@ export const checkCollision = (
     rect1.x + rect1.width > rect2.x &&
     rect1.y < rect2.y + rect2.height &&
     rect1.y + rect1.height > rect2.y
-  )
-}
+  );
+};
 
 export const createParticles = (
   x: number,
@@ -25,17 +25,36 @@ export const createParticles = (
       vx: (Math.random() - 0.5) * 2,
       vy: Math.random() * 2 + 1,
       life: 1,
-      color
-    })
+      color,
+    });
   }
-}
+};
 
-export const initializeRacers = (colors: string[], mapHeight: number): Car[] => {
-  return colors.map(color => {
-    const isLeft = Math.random() > 0.5
+export const initializeRacers = (
+  colors: string[],
+  mapHeight: number,
+  safeDistance = 0
+): Car[] => {
+  return colors.map((color) => {
+    const isLeft = Math.random() > 0.5;
+    let yPosition = Math.random() * mapHeight;
+
+    // If safe distance is provided, ensure cars don't spawn near player (mapHeight / 2)
+    if (safeDistance > 0) {
+      const playerY = mapHeight / 2;
+      // Spawn cars either above or below the safe zone
+      if (Math.random() > 0.5) {
+        // Spawn above player (negative direction)
+        yPosition = playerY - safeDistance - Math.random() * (mapHeight / 4);
+      } else {
+        // Spawn below player (positive direction)
+        yPosition = playerY + safeDistance + Math.random() * (mapHeight / 4);
+      }
+    }
+
     return {
       x: Math.random() * 180 + 110,
-      y: Math.random() * mapHeight,
+      y: yPosition,
       width: 20,
       height: 35,
       color,
@@ -43,7 +62,7 @@ export const initializeRacers = (colors: string[], mapHeight: number): Car[] => 
       direction: Math.random(),
       isLeft,
       isRight: !isLeft,
-      passed: false
-    }
-  })
-}
+      passed: false,
+    };
+  });
+};
